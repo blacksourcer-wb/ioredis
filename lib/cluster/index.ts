@@ -439,7 +439,7 @@ class Cluster extends Commander {
     if (this.isRefreshing) {
       return;
     }
-    
+
     this.isRefreshing = true;
 
     const _this = this;
@@ -504,7 +504,12 @@ class Cluster extends Commander {
       const isCommandReadOnly =
         command.isReadOnly ||
         (exists(command.name) && hasFlag(command.name, "readonly"));
-      if (!isCommandReadOnly) {
+
+      const isStreamReadOnly = stream && 'isReadOnly' in stream
+          ? stream.isReadOnly
+          : undefined;
+
+      if (!isCommandReadOnly || (false === isStreamReadOnly)) {
         to = "master";
       }
     }

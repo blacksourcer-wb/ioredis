@@ -293,6 +293,7 @@ Pipeline.prototype.exec = function (callback: Callback): Promise<Array<any>> {
     this.resolve([]);
   }
   let pipelineSlot: number;
+  let isPipelineReadOnly = true;
   if (this.isCluster) {
     // List of the first key for each command
     const sampleKeys: string[] = [];
@@ -312,6 +313,12 @@ Pipeline.prototype.exec = function (callback: Callback): Promise<Array<any>> {
 
         return this.promise;
       }
+
+      const isCommandReadOnly =
+          this._queue[i].isReadOnly ||
+          (exists(this._queue[i].name) && hasFlag(this._queue[i].name, "readonly"));
+
+      isPipelineReadOnly &&= isCommandReadOnly;
     }
 
     if (sampleKeys.length) {
@@ -351,6 +358,7 @@ Pipeline.prototype.exec = function (callback: Callback): Promise<Array<any>> {
     let buffers: Buffer[];
     const stream: PipelineWriteableStream = {
       isPipeline: true,
+      isReadOnly: isPipelineReadOnly,
       destination: _this.isCluster ? node : { redis: _this.redis },
       write(writable) {
         if (typeof writable !== "string") {

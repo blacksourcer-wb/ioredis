@@ -14,6 +14,7 @@ export interface Respondable {
 
 export interface PipelineWriteableStream {
   isPipeline: true;
+  isReadOnly: boolean;
   write(data: string | Buffer): unknown;
   destination: { redis: { stream: NetStream } };
 }
